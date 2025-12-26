@@ -1,0 +1,8 @@
+{
+  "name": "TaoFlow: El Camino del Tai Chi",
+  "description": "Una aplicación interactiva para aprender Tai Chi Chuan que utiliza IA para evaluaciones iniciales, generación de planes de lecciones personalizados y corrección de postura en tiempo real.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
