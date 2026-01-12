@@ -2,6 +2,7 @@
 import React from 'react';
 import { Activity, Users, ChevronRight, Wind, Award, Zap, Star } from 'lucide-react';
 import { Tab, UserProfile } from '../types';
+import { calculateLevel } from '../lib/levelSystem';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -9,6 +10,8 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ profile, onNavigate }) => {
+  const levelInfo = calculateLevel(profile.points);
+
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
@@ -53,7 +56,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, onNavigate }) => 
               </div>
             </div>
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-teal-600 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">
-              Progreso: Nivel {Math.floor(profile.points / 1000) + 1}
+              Nivel {levelInfo.level} - {levelInfo.title}
             </div>
           </div>
 
@@ -66,11 +69,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, onNavigate }) => 
               <div className="w-full bg-stone-200/50 rounded-full h-4 mb-3 border border-stone-200">
                 <div
                   className="bg-teal-600 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(13,148,136,0.5)]"
-                  style={{ width: `${(profile.points % 1000) / 10}%` }}
+                  style={{ width: `${levelInfo.progress}%` }}
                 ></div>
               </div>
               <p className="text-sm text-stone-400 font-medium">
-                Próximo nivel: {Math.ceil(profile.points / 1000 + 1) * 1000} XP
+                Próximo nivel: {levelInfo.nextLevelXP} XP
               </p>
             </div>
           </div>

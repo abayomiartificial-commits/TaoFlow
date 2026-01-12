@@ -1,8 +1,10 @@
 
+
 import React from 'react';
 import { Settings, Trophy, Medal, Star, Flame, Wind, Target, ShieldCheck, ChevronRight, Award, CheckCircle2, BookOpen, LogOut } from 'lucide-react';
 import { UserProfile, Badge, Lesson } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { calculateLevel } from '../lib/levelSystem';
 
 interface ProfileProps {
   profile: UserProfile;
@@ -21,16 +23,19 @@ const IconMap = {
 
 export const Profile: React.FC<ProfileProps> = ({ profile, lessons }) => {
   const { signOut } = useAuth();
-  const nextLevelPoints = Math.ceil(profile.points / 1000 + 1) * 1000;
-  const progress = (profile.points % 1000) / 10;
+  const levelInfo = calculateLevel(profile.points);
+  const progress = levelInfo.progress;
+
+  // Safe defaults for arrays
+  const badges = profile.badges || [];
+  const achievements = profile.achievements || [];
 
   const handleSignOut = async () => {
-    if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-      try {
-        await signOut();
-      } catch (error) {
-        console.error('Error signing out:', error);
-      }
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+      alert('Error al cerrar sesión. Por favor intenta de nuevo.');
     }
   };
 
@@ -65,12 +70,12 @@ export const Profile: React.FC<ProfileProps> = ({ profile, lessons }) => {
               Nivel {Math.floor(profile.points / 1000) + 1}
             </span>
           </div>
-          <p className="text-stone-500 text-lg mb-6 italic">"{profile.experience || 'Buscador de equilibrio'}"</p>
+          <p className="text-stone-500 text-lg mb-6 italic">"{levelInfo.title}"</p>
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm font-bold text-stone-400 uppercase tracking-tighter">
               <span>Progreso de Maestría</span>
-              <span>{profile.points} / {nextLevelPoints} XP</span>
+              <span>{profile.points} / {levelInfo.nextLevelXP} XP</span>
             </div>
             <div className="w-full h-3 bg-stone-100 rounded-full overflow-hidden border border-stone-200">
               <div
@@ -91,7 +96,7 @@ export const Profile: React.FC<ProfileProps> = ({ profile, lessons }) => {
           <div className="bg-stone-50 p-4 rounded-2xl text-center border border-stone-100">
             <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Insignias</p>
             <div className="flex items-center justify-center gap-1 text-2xl font-serif text-teal-600">
-              {profile.badges.filter(b => b.unlocked).length} <Award size={20} />
+              {badges.filter(b => b.unlocked).length} <Award size={20} />
             </div>
           </div>
         </div>
@@ -104,7 +109,7 @@ export const Profile: React.FC<ProfileProps> = ({ profile, lessons }) => {
             Tu Vitrina de Logros <Medal className="text-teal-600" />
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {profile.badges.map((badge) => {
+            {badges.map((badge) => {
               const Icon = IconMap[badge.icon];
               return (
                 <div
@@ -133,8 +138,8 @@ export const Profile: React.FC<ProfileProps> = ({ profile, lessons }) => {
               Actividad Reciente <Target className="text-teal-600" size={24} />
             </h3>
             <div className="space-y-4">
-              {profile.achievements.length > 0 ? (
-                profile.achievements.slice(-5).reverse().map((achievement) => (
+              {achievements.length > 0 ? (
+                achievements.slice(-5).reverse().map((achievement) => (
                   <div key={achievement.id} className="bg-white p-5 rounded-2xl border border-stone-100 shadow-sm flex items-center justify-between group hover:border-teal-200 transition-colors">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all">

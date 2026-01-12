@@ -8,6 +8,7 @@ import curriculumRoutes from '../routes/curriculum.js';
 import postureRoutes from '../routes/posture.js';
 import userRoutes from '../routes/user.js';
 import lessonsRoutes from '../routes/lessons.js';
+import adminRoutes from '../routes/admin.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from '../middleware/errorHandler.js';
@@ -49,6 +50,7 @@ app.use('/api/curriculum', curriculumRoutes);
 app.use('/api/posture', postureRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/lessons', lessonsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

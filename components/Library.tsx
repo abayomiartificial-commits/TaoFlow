@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Play, Lock, Unlock, Clock, Star, Sparkles, Wind, Award, CheckCircle2 } from 'lucide-react';
 import { Lesson } from '../types';
+import { AchievementNotification } from './AchievementNotification';
 
 interface LibraryProps {
   lessons: Lesson[];
@@ -9,13 +10,50 @@ interface LibraryProps {
 }
 
 export const Library: React.FC<LibraryProps> = ({ lessons, onCompleteLesson }) => {
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationData, setNotificationData] = useState({ title: '', points: 0 });
+  const [showXpGain, setShowXpGain] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+
+  const handleCompleteLesson = async (lessonId: string) => {
+    await onCompleteLesson(lessonId);
+
+    // Show XP gain animation
+    setXpGained(150);
+    setShowXpGain(true);
+    setTimeout(() => setShowXpGain(false), 3000);
+
+    // Show achievement notification
+    setNotificationData({ title: 'Lección Completada', points: 150 });
+    setShowNotification(true);
+  };
+
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto animate-in fade-in duration-700">
+      {/* XP Gain Notification */}
+      {showXpGain && (
+        <div className="fixed top-20 right-10 bg-gradient-to-r from-orange-500 to-orange-400 text-white px-6 py-4 rounded-2xl shadow-2xl animate-bounce z-50">
+          <div className="flex items-center gap-3">
+            <Star className="text-yellow-200" fill="currentColor" size={24} />
+            <span className="font-bold text-xl">+{xpGained} XP</span>
+          </div>
+        </div>
+      )}
+
+      {/* Achievement Notification */}
+      {showNotification && (
+        <AchievementNotification
+          title={notificationData.title}
+          points={notificationData.points}
+          onClose={() => setShowNotification(false)}
+        />
+      )}
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div>
           <div className="flex items-center gap-2 mb-2">
-             <span className="bg-teal-600/10 text-teal-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Tu Camino TaoFlow</span>
-             <Sparkles size={14} className="text-teal-600" />
+            <span className="bg-teal-600/10 text-teal-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Tu Camino TaoFlow</span>
+            <Sparkles size={14} className="text-teal-600" />
           </div>
           <h2 className="text-4xl md:text-5xl font-serif text-stone-800 leading-tight">Biblioteca de Aprendizaje</h2>
           <p className="text-stone-500 mt-3 text-lg max-w-2xl">Cada lección ha sido seleccionada por nuestra IA basada en tu evaluación inicial.</p>
@@ -24,15 +62,15 @@ export const Library: React.FC<LibraryProps> = ({ lessons, onCompleteLesson }) =
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
         {lessons.map((lesson, idx) => (
-          <div 
-            key={lesson.id} 
+          <div
+            key={lesson.id}
             className={`group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-stone-100 flex flex-col ${lesson.locked ? 'opacity-70 grayscale' : ''}`}
           >
             <div className="h-56 overflow-hidden relative">
-              <img 
-                src={`https://picsum.photos/seed/${lesson.id}/800/600`} 
-                alt={lesson.title} 
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+              <img
+                src={`https://picsum.photos/seed/${lesson.id}/800/600`}
+                alt={lesson.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
               <div className="absolute top-6 right-6">
@@ -51,16 +89,16 @@ export const Library: React.FC<LibraryProps> = ({ lessons, onCompleteLesson }) =
                 )}
               </div>
             </div>
-            
+
             <div className="p-8 flex-1 flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-xs font-bold text-teal-600 uppercase tracking-widest">Lección {idx + 1}</span>
                 <span className="text-xs font-bold text-orange-500">+150 XP</span>
               </div>
-              
+
               <h3 className="text-2xl font-bold text-stone-800 mb-3 leading-tight">{lesson.title}</h3>
               <p className="text-stone-500 text-sm leading-relaxed mb-8 flex-1">{lesson.description}</p>
-              
+
               {lesson.completed ? (
                 <button className="w-full py-4 bg-teal-50 text-teal-700 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
                   <CheckCircle2 size={16} /> Lección Completada
@@ -70,8 +108,8 @@ export const Library: React.FC<LibraryProps> = ({ lessons, onCompleteLesson }) =
                   <Lock size={16} /> Bloqueada
                 </button>
               ) : (
-                <button 
-                  onClick={() => onCompleteLesson(lesson.id)}
+                <button
+                  onClick={() => handleCompleteLesson(lesson.id)}
                   className="w-full py-4 bg-stone-900 text-white rounded-2xl font-bold text-sm hover:bg-stone-800 transition-all shadow-xl shadow-stone-900/20 flex items-center justify-center gap-2"
                 >
                   Comenzar Práctica <Play size={16} fill="white" />

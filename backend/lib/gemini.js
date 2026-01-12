@@ -24,7 +24,14 @@ export const generateTaiChiCurriculum = async (evaluationData) => {
   - Limitaciones físicas: ${physicalLimitations}
   - Experiencia previa: ${previousExperience}
 
-  Asegúrate de que las lecciones sean progresivas y seguras.`;
+  Asegúrate de que las lecciones sean progresivas y seguras.
+  
+  IMPORTANTE: 
+  - El campo "category" DEBE ser uno de estos valores exactos: "fundamento", "forma", "respiracion" (todo en minúsculas)
+  - El campo "difficulty" DEBE ser uno de estos valores exactos: "principiante", "intermedio", "avanzado" (todo en minúsculas)
+  - El campo "duration" debe ser un string como "30 minutos" o "45 minutos"
+  - El campo "locked" debe ser false para la primera lección y true para las demás
+  - El campo "id" debe ser un código único como "TC001", "TC002", etc.`;
 
     try {
         const response = await ai.models.generateContent({

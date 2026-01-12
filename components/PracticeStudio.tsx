@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, RefreshCw, Play, Pause, AlertCircle, CheckCircle2, Maximize2, Sparkles, X, Activity } from 'lucide-react';
+import { Camera as CameraIcon, RefreshCw, Play, Pause, AlertCircle, CheckCircle2, Maximize2, Sparkles, X, Activity } from 'lucide-react';
 import * as api from '../lib/api';
 
 declare var Pose: any;
@@ -147,11 +147,11 @@ export const PracticeStudio: React.FC = () => {
         <button
           onClick={isCameraActive ? stopCamera : startCamera}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all ${isCameraActive
-              ? 'bg-red-500/10 text-red-400 border border-red-500/50 hover:bg-red-500 hover:text-white'
-              : 'bg-teal-600 text-white hover:bg-teal-500 shadow-xl shadow-teal-600/20'
+            ? 'bg-red-500/10 text-red-400 border border-red-500/50 hover:bg-red-500 hover:text-white'
+            : 'bg-teal-600 text-white hover:bg-teal-500 shadow-xl shadow-teal-600/20'
             }`}
         >
-          {isCameraActive ? <X size={18} /> : <Camera size={18} />}
+          {isCameraActive ? <X size={18} /> : <CameraIcon size={18} />}
           {isCameraActive ? 'Detener IA' : 'Iniciar Espejo IA'}
         </button>
       </div>
@@ -204,7 +204,7 @@ export const PracticeStudio: React.FC = () => {
             {!isCameraActive && (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
                 <div className="w-16 h-16 bg-stone-800 rounded-full flex items-center justify-center mb-4 text-stone-500">
-                  <Camera size={32} />
+                  <CameraIcon size={32} />
                 </div>
                 <h3 className="text-lg font-serif text-white mb-2">Cámara Inactiva</h3>
                 <p className="text-stone-500 text-sm">Inicia la IA para ver tu flujo de energía.</p>

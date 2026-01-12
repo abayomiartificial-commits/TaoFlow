@@ -56,13 +56,34 @@ router.get('/profile', requireAuth, async (req, res, next) => {
 
             return res.json({
                 success: true,
-                profile: newProfile
+                profile: {
+                    ...newProfile,
+                    badges: [],
+                    achievements: []
+                }
             });
         }
 
+        // Fetch badges
+        const { data: badgesData } = await supabaseAdmin
+            .from('badges')
+            .select('*')
+            .eq('user_id', req.user.id);
+
+        // Fetch achievements
+        const { data: achievementsData } = await supabaseAdmin
+            .from('achievements')
+            .select('*')
+            .eq('user_id', req.user.id)
+            .order('earned_at', { ascending: false });
+
         res.json({
             success: true,
-            profile: data
+            profile: {
+                ...data,
+                badges: badgesData || [],
+                achievements: achievementsData || []
+            }
         });
     } catch (error) {
         next(error);

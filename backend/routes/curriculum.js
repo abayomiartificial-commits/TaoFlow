@@ -27,6 +27,12 @@ router.post('/generate', requireAuth, async (req, res, next) => {
         // Generate curriculum using Gemini
         const lessons = await generateTaiChiCurriculum(evaluationData);
 
+        // Delete existing lessons for this user (if any) to allow regeneration
+        await supabaseAdmin
+            .from('lessons')
+            .delete()
+            .eq('user_id', req.user.id);
+
         // Save lessons to database
         const { data, error } = await supabaseAdmin
             .from('lessons')
@@ -50,6 +56,12 @@ router.post('/generate', requireAuth, async (req, res, next) => {
             console.error('Database error:', error);
             throw new Error('Failed to save lessons');
         }
+
+        // Mark user as onboarded
+        await supabaseAdmin
+            .from('profiles')
+            .update({ onboarded: true })
+            .eq('user_id', req.user.id);
 
         res.json({
             success: true,

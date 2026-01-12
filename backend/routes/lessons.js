@@ -12,20 +12,28 @@ router.post('/:id/complete', requireAuth, async (req, res, next) => {
     try {
         const lessonId = req.params.id;
 
-        // Update lesson status
+        // Update lesson status (search by UUID id, not lesson_id)
         const { data: lesson, error: lessonError } = await supabaseAdmin
             .from('lessons')
             .update({
                 completed: true,
                 completed_at: new Date().toISOString()
             })
-            .eq('lesson_id', lessonId)
+            .eq('id', lessonId)  // Changed from 'lesson_id' to 'id'
             .eq('user_id', req.user.id)
             .select()
             .single();
 
         if (lessonError) {
-            throw new Error('Failed to complete lesson');
+            console.error('Lesson completion error:', lessonError);
+            console.error('Lesson ID:', lessonId);
+            console.error('User ID:', req.user.id);
+            throw new Error(`Failed to complete lesson: ${lessonError.message || JSON.stringify(lessonError)}`);
+        }
+
+        if (!lesson) {
+            console.error('No lesson found with ID:', lessonId, 'for user:', req.user.id);
+            throw new Error('Lesson not found');
         }
 
         // Award XP
@@ -45,10 +53,28 @@ router.post('/:id/complete', requireAuth, async (req, res, next) => {
                 earned_at: new Date().toISOString()
             });
 
+        // Auto-unlock next lesson
+        const { data: nextLesson } = await supabaseAdmin
+            .from('lessons')
+            .select('*')
+            .eq('user_id', req.user.id)
+            .eq('locked', true)
+            .order('created_at', { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
+        if (nextLesson) {
+            await supabaseAdmin
+                .from('lessons')
+                .update({ locked: false })
+                .eq('id', nextLesson.id);
+        }
+
         res.json({
             success: true,
             lesson,
-            xpGained: xpGain
+            xpGained: xpGain,
+            nextLessonUnlocked: !!nextLesson
         });
     } catch (error) {
         next(error);
