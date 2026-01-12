@@ -1,15 +1,19 @@
 {
-    "buildCommand": "npm run build",
-    "outputDirectory": "dist",
-    "framework": "vite",
+    "functions": {
+        "backend/api/index.js": {
+            "runtime": "nodejs20.x"
+        }
+    },
     "rewrites": [
         {
             "source": "/api/:path*",
             "destination": "/backend/api/index.js"
-        },
+        }
+    ],
+    "routes": [
         {
-            "source": "/:path*",
-            "destination": "/index.html"
+            "src": "/(.*)",
+            "dest": "/index.html"
         }
     ]
 }
